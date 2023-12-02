@@ -4,11 +4,17 @@ class AnimatedFloatingActionButton extends StatefulWidget {
   const AnimatedFloatingActionButton(
       {super.key,
       this.backgroundColor,
+      this.borderRadius,
+      this.duration,
       required this.expandedHeight,
-      required this.expandedWidth})
+      required this.expandedWidth,
+      required this.child})
       : assert(expandedWidth >= minimumWidth),
         assert(expandedHeight >= minimumHeight);
   final Color? backgroundColor;
+  final BorderRadius? borderRadius;
+  final Duration? duration;
+  final Widget child;
   final double expandedHeight;
   final double expandedWidth;
   static const double minimumHeight = 4.0;
@@ -32,15 +38,17 @@ class _AnimatedFloatingActionButtonState
   Widget build(BuildContext context) {
     Size screenSize = MediaQuery.of(context).size;
     return Container(
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-        boxShadow: [
+      decoration: BoxDecoration(
+        borderRadius:
+            widget.borderRadius ?? const BorderRadius.all(Radius.circular(10)),
+        boxShadow: const [
           BoxShadow(
               color: Colors.black26, offset: Offset(2, 2), blurRadius: 2.0)
         ],
       ),
       child: Material(
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        borderRadius:
+            widget.borderRadius ?? const BorderRadius.all(Radius.circular(10)),
         shadowColor: Colors.black,
         color: widget.backgroundColor ??
             Theme.of(context).colorScheme.inversePrimary,
@@ -49,7 +57,8 @@ class _AnimatedFloatingActionButtonState
               ? const MaterialStatePropertyAll(Colors.transparent)
               : null,
           enableFeedback: isClicked ? false : true,
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          borderRadius: widget.borderRadius ??
+              const BorderRadius.all(Radius.circular(10)),
           splashColor: isClicked ? null : Colors.grey.withOpacity(0.2),
           splashFactory: isClicked ? null : InkSplash.splashFactory,
           onTap: () => isClicked
@@ -57,15 +66,60 @@ class _AnimatedFloatingActionButtonState
               : {toggleClick(), print(screenSize.width * 14 / 100)},
           child: AnimatedContainer(
             margin: EdgeInsets.all(screenSize.width * 0 / 100),
-            duration: const Duration(milliseconds: 150),
+            duration: widget.duration ?? const Duration(milliseconds: 150),
             height:
                 isClicked ? widget.expandedHeight : screenSize.width * 14 / 100,
             width:
                 isClicked ? widget.expandedWidth : screenSize.width * 14 / 100,
             child: isClicked
-                ? ListTile(
-                    visualDensity: VisualDensity(),
-                  )
+                ? SingleChildScrollView(
+                    child: ListView(
+                    children: [
+                      widget.child,
+                      Row(
+                        children: [
+                          ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color(0xff60B478)),
+                                  shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ))),
+                              onPressed: () {},
+                              child: Text(
+                                'Add task',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    overflow: TextOverflow.fade),
+                              )),
+                          ElevatedButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStatePropertyAll(
+                                      Color(0xff60B478)),
+                                  shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ))),
+                              onPressed: () => setState(() {
+                                    toggleClick();
+                                  }),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15,
+                                    overflow: TextOverflow.fade),
+                              )),
+                        ],
+                      )
+                    ],
+                  ))
                 : const Icon(Icons.add),
           ),
         ),

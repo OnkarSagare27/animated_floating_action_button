@@ -73,7 +73,7 @@ class _AnimatedFloatingActionButtonState
                 isClicked ? widget.expandedWidth : screenSize.width * 14 / 100,
             child: isClicked
                 ? SingleChildScrollView(
-                    child: Columnks(
+                    child: Column(
                     children: [
                       widget.child,
                       Row(
